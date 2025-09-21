@@ -93,4 +93,4 @@
 - [Composer Documentation](https://getcomposer.org/doc/)
 
 ## Ссылки на пакеты
-- [Packagist пакет Minesweeper](https://packagist.org/packages/belokosoff/minesweeper) # minesweeper
+- [Packagist пакет Minesweeper](https://packagist.org/packages/belokosoff/minesweeper) 
