@@ -1,6 +1,22 @@
 #!/usr/bin/env php
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
+
+$autoloadPaths = [
+    __DIR__ . '/../../autoload.php',
+    __DIR__ . '/../vendor/autoload.php',
+];
+
+foreach ($autoloadPaths as $path) {
+    if (file_exists($path)) {
+        require_once $path;
+        break;
+    }
+}
+
+if (!class_exists(\Composer\Autoload\ClassLoader::class)) {
+    fwrite(STDERR, "Error: Autoload file not found. Run 'composer install' in your project root.\n");
+    exit(1);
+}
 
 use belokosoff\minesweeper\ConsoleApplication;
 
