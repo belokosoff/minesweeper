@@ -1,4 +1,5 @@
 <?php
+
 namespace belokosoff\minesweeper;
 
 class GameController
@@ -15,13 +16,11 @@ class GameController
     public function startNewGame(): void
     {
         $this->view->showWelcomeMessage();
-        
-        // Get game parameters using cli
+
         $size = (int) \cli\prompt("Enter field size", 10);
         $mines = (int) \cli\prompt("Enter number of mines", 15);
         $playerName = \cli\prompt("Enter your name", "Player");
 
-        // Validate input
         if ($size < 5) {
             $size = 5;
             \cli\line("Field size set to minimum: 5");
@@ -60,27 +59,32 @@ class GameController
             $command = strtoupper($parts[0]);
 
             if ($command === 'M' && count($parts) === 3) {
-                // Flag/unflag mine
                 $row = (int) $parts[1];
                 $col = (int) $parts[2];
                 $result = $this->model->toggleFlag($row, $col);
                 \cli\line($result ? "Cell flagged/unflagged" : "Invalid coordinates");
             } elseif (count($parts) === 2) {
-                // Open cell
                 $row = (int) $parts[0];
                 $col = (int) $parts[1];
                 $moveCount++;
 
                 $result = $this->model->openCell($row, $col);
-                
+
                 if ($result['game_over']) {
                     $gameOver = true;
                     $this->view->displayField($this->model->getFullField(), 0);
-                    
+
+                    $resultType = $result['win'] ? 'win' : 'lose';
+
+                    $db = new Database();
+                    $gameId = $db->saveGame($this->model, $resultType, $moveCount);
+
                     if ($result['win']) {
                         $this->view->showWinMessage($moveCount);
+                        \cli\line("✅ Game saved with ID: $gameId");
                     } else {
                         $this->view->showGameOverMessage();
+                        \cli\line("❌ Game saved with ID: $gameId");
                     }
                 } else {
                     \cli\line("Cell opened. Adjacent mines: " . $result['adjacent_mines']);
